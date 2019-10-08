@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript" src="jquery-3.3.1.min.js"></script> 
+
+<script type="text/javascript">
+$(function() {
+	$(document).ready(function() {
+		function getArgMap() {
+			var argMap = new Map();
+			var args = window.location.search;
+			for (var arg of args.split('&')) {
+				var item = arg.split('=')[0].replace('?', '');
+				var value = arg.split('=')[1];
+				
+				argMap.set(item, value);
+			}
+			return argMap;
+		}
+		function getArgValue(arg) {
+			if (argMap.has(arg)) {
+				return argMap.get(arg);
+			}
+			return "";
+		}
+		
+		var argMap = getArgMap();
+
+		if (argMap.has("code")) {
+			var code = getArgValue('code');
+			var scope = getArgValue('scope');
+			login(code);
+			return;
+		}
+		
+		$('#login').click(function() {
+			localStorage.setItem('clientid', $('#clientid').val());
+			localStorage.setItem('clientsecret', $('#clientsecret').val());
+			login();		
+		});
+		
+		function login(code) {
+			var client_id = localStorage.getItem('clientid');
+			var client_secret = localStorage.getItem('clientsecret');
+			
+			$.ajax({
+			   type: "GET", 
+			   url: "http://" + window.location.host + "/api/system/login?client_id=" + 
+			   	client_id + "&client_secret=" + client_secret + "&code=" + code,
+			   success: function(response){
+			   	if (response.startsWith('Redirect;')) {
+			   		var url = response.split(';')[1];
+			   		window.location.href = url;
+			   	}
+			   	else if (response.startsWith('LoggedIn;')) {
+			   		$('#name').text(response.split(';')[1]);
+			   	}
+			   }
+			});		
+		}
+	});
+})
+</script>
+<head>
+<meta charset="UTF-8">
+<title>Users</title>
+</head>
+<body> 
+<button id="login">Login</button>
+Client ID<input type="text" id="clientid" value="">
+Client Secret<input type="text" id="clientsecret" value="">
+<label id="name"></label>
+</body>
+</html>
