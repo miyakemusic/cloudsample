@@ -28,6 +28,7 @@ public class CloudServer {
 	
 	private void initializeWebServer(int port, String clientId, String clientSecret) {
 		googleHandler.setClientIdSecret(clientId, clientSecret);
+//		googleHandler.setProxyInfo(user, password);
 		
 		Server server = null;//new Server(port);
         	

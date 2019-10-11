@@ -37,6 +37,9 @@ public class SystemResource {
 			GooglePersonalResponse personal = googleHandler.retrievePersonal(access_token);
 			
 			GoogleFile file = googleHandler.retrieveFiles(access_token);
+			System.out.println(file);
+			
+			googleHandler.postFile(access_token);
 			personal.access_token = access_token;
 			
 			return "LoggedIn;" + personal.family_name;//new KeyValue("Complete", personal.name);	
