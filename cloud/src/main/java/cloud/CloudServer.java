@@ -7,22 +7,28 @@ import org.eclipse.jetty.webapp.WebAppContext;
 
 public class CloudServer {
 	
+//	public static String clientId;
+//	public static String clientSecret;
+	public static GoogleHandlerImpl googleHandler = new GoogleHandlerImpl();
+	
 	public static void main(String[] arg) {
-		new CloudServer(8081);
+		new CloudServer(8081, arg[0], arg[1]);
 	}
 
 	
-	public CloudServer(final int port) {
+	public CloudServer(final int port, String clientId, String clientSecret) {
+		
 		new Thread() {
 			@Override
 			public void run() {
-				initializeWebServer(port);
+				initializeWebServer(port, clientId, clientSecret);
 			}
 		}.start();
 	}
 	
-	private void initializeWebServer(int port) {
-	
+	private void initializeWebServer(int port, String clientId, String clientSecret) {
+		googleHandler.setClientIdSecret(clientId, clientSecret);
+		
 		Server server = null;//new Server(port);
         	
 		server = new Server(port);

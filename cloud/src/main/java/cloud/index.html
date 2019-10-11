@@ -33,8 +33,6 @@ $(function() {
 		}
 		
 		$('#login').click(function() {
-			localStorage.setItem('clientid', $('#clientid').val());
-			localStorage.setItem('clientsecret', $('#clientsecret').val());
 			login();		
 		});
 		
@@ -44,8 +42,7 @@ $(function() {
 			
 			$.ajax({
 			   type: "GET", 
-			   url: "http://" + window.location.host + "/api/system/login?client_id=" + 
-			   	client_id + "&client_secret=" + client_secret + "&code=" + code,
+			   url: "http://" + window.location.host + "/api/system/login?&code=" + code,
 			   success: function(response){
 			   	if (response.startsWith('Redirect;')) {
 			   		var url = response.split(';')[1];
@@ -66,8 +63,6 @@ $(function() {
 </head>
 <body> 
 <button id="login">Login</button>
-Client ID<input type="text" id="clientid" value="">
-Client Secret<input type="text" id="clientsecret" value="">
 <label id="name"></label>
 </body>
 </html>

@@ -16,14 +16,12 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/system")
 public class SystemResource {
-	private static GoogleHandlerImpl googleHandler = new GoogleHandlerImpl();
-
 
 	@GET
 	@Path("/login")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String login2(@QueryParam("client_id") final String client_id, @QueryParam("client_secret") final String client_secret, 
-			@QueryParam("code") final String code, @QueryParam("name") final String name) {
+	public String login2(@QueryParam("code") final String code, @QueryParam("name") final String name) {
+		GoogleHandlerImpl googleHandler = CloudServer.googleHandler;
 		
 		String redirectUri = "http://" + getMyAddress();
 		try {
@@ -33,17 +31,19 @@ public class SystemResource {
 				access_token = googleHandler.getStoredAccessToken(name);
 			}
 			else {
-				GoogleAccressTokenResponse accessToken = googleHandler.retrieveAccessToken(code, redirectUri, client_id, client_secret);
+				GoogleAccressTokenResponse accessToken = googleHandler.retrieveAccessToken(code, redirectUri);
 				access_token = accessToken.access_token;
 			}
 			GooglePersonalResponse personal = googleHandler.retrievePersonal(access_token);
+			
+			GoogleFile file = googleHandler.retrieveFiles(access_token);
 			personal.access_token = access_token;
 			
 			return "LoggedIn;" + personal.family_name;//new KeyValue("Complete", personal.name);	
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			String url = googleHandler.getAuthUri(redirectUri, client_id);
+			String url = googleHandler.getAuthUri(redirectUri);
 			return "Redirect;" + url;
 		}
 	}

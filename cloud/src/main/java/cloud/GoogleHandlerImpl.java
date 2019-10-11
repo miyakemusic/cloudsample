@@ -15,25 +15,23 @@ import okhttp3.Response;
 public class GoogleHandlerImpl {
 	
 	private Map<String, String> acccessTokenMap = new HashMap<>();
+	private String clientId;
+	private String clientSecret;
 	
 	
 //	private String client_id = "";
 //	private String client_secret = "";
 	
-	public GoogleAccressTokenResponse retrieveAccessToken(String code, String redirectUri, String client_id, String client_secret) throws Exception {		
+	public GoogleAccressTokenResponse retrieveAccessToken(String code, String redirectUri) throws Exception {		
         Map<String, String> formParams = new HashMap<>();
       
-        formParams.put("client_id", client_id);
-        formParams.put("client_secret", client_secret);
+        formParams.put("client_id", clientId);
+        formParams.put("client_secret", clientSecret);
         formParams.put("redirect_uri", redirectUri);
         
         formParams.put("grant_type", "authorization_code");
         formParams.put("access_type", "offline");
         formParams.put("code", code);
-        
-        System.out.println("client_id=" + client_id);
-        System.out.println("client_secret=" + client_secret);
-        System.out.println("code=" + code);
         
         final FormBody.Builder formBuilder = new FormBody.Builder();
         formParams.forEach((k, v) -> formBuilder.add(k, v));
@@ -66,9 +64,22 @@ public class GoogleHandlerImpl {
 		return new ObjectMapper().readValue(responseOk.body().string(), GooglePersonalResponse.class);	
 	}
 
-	public String getAuthUri(String redirectUri, String client_id) {
-		return "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirectUri
-				+ "&scope=https://www.googleapis.com/auth/userinfo.profile&access_type=offline&approval_prompt=force";
+	public GoogleFile retrieveFiles(String accessToken) throws Exception {
+		OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://www.googleapis.com/drive/v3/files?access_token=" + accessToken)
+                .get()
+                .build();
+        Response responseOk = client.newCall(request).execute();
+		return new ObjectMapper().readValue(responseOk.body().string(), GoogleFile.class);	
+	}
+		
+	public String getAuthUri(String redirectUri) {
+		return "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUri
+				+ "&scope=https://www.googleapis.com/auth/userinfo.profile" + 
+				"%20https://www.googleapis.com/auth/drive.appdata" + 
+				"%20https://www.googleapis.com/auth/drive.file" + 
+				"&access_type=offline&approval_prompt=force";
 	}
 
 	public boolean hasStoredAccessToken(String name) {
@@ -77,6 +88,11 @@ public class GoogleHandlerImpl {
 
 	public String getStoredAccessToken(String name) {
 		return acccessTokenMap.get(name);
+	}
+
+	public void setClientIdSecret(String clientId, String clientSecret) {
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 	}
 
 
