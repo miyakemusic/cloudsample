@@ -23,9 +23,10 @@ import okhttp3.Route;
 
 public class GoogleHandlerImpl {
 	
-	private Map<String, String> acccessTokenMap = new HashMap<>();
+//	private Map<String, String> acccessTokenMap = new HashMap<>();
 	private String clientId;
 	private String clientSecret;
+	private String accessToken = "";
 	
 	
 //	private String client_id = "";
@@ -43,7 +44,12 @@ public class GoogleHandlerImpl {
         formParams.put("code", code);
         
         final FormBody.Builder formBuilder = new FormBody.Builder();
-        formParams.forEach((k, v) -> formBuilder.add(k, v));
+  //      formParams.forEach((k, v) -> formBuilder.add(k, v));
+        
+        for (Map.Entry<String, String> entry : formParams.entrySet()) {
+        	 formBuilder.add(entry.getKey(), entry.getValue());
+        }
+        
         RequestBody requestBody = formBuilder.build();
         System.out.println("Request request = new Request.Builder()");
         Request request = new Request.Builder()
@@ -63,7 +69,7 @@ public class GoogleHandlerImpl {
         return response;
 	}
 
-	public GooglePersonalResponse retrievePersonal(String accessToken) throws Exception {
+	public GooglePersonalResponse retrievePersonal() throws Exception {
 		OkHttpClient client = createHttpClient();//new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + accessToken)
@@ -73,7 +79,7 @@ public class GoogleHandlerImpl {
 		return new ObjectMapper().readValue(responseOk.body().string(), GooglePersonalResponse.class);	
 	}
 
-	public GoogleFile retrieveFiles(String accessToken) throws Exception {
+	public GoogleFile retrieveFiles() throws Exception {
 		OkHttpClient client = createHttpClient();//new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://www.googleapis.com/drive/v3/files?access_token=" + accessToken)
@@ -84,30 +90,10 @@ public class GoogleHandlerImpl {
         return ret;
 	}
 		
-	public String postFile(String accessToken) {       
-		File image = new File("C:\\Users\\a1199022\\Pictures\\ticci-ipad-portrait_ipadmini_black_landscape.jpg");
-		
-        final RequestBody requestBody = RequestBody.create(MediaType.parse("image/jpg"), image);    
-		
-//		RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-//                .addFormDataPart("file", "myfile.jpg", RequestBody.create(MediaType.parse("image/jpg"), image))
-//                .build();
-		
-		OkHttpClient client = createHttpClient();//new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://www.googleapis.com/upload/drive/v3/files?uploadType=media")//&access_token=" + accessToken)
-                .addHeader("Authorization", "Bearer " + accessToken)
-                .addHeader("Content-Type", "image/jpeg")
-                .addHeader("Content-Length", String.valueOf(image.length()))
-                .post(requestBody)
-                .build();
-        try {
-			Response responseOk = client.newCall(request).execute();
-			return responseOk.toString();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+	public String setAccesstoken(String accessToken) {       
+		this.accessToken = accessToken;
+//		File image = new File("C:\\Users\\a1199022\\Pictures\\ticci-ipad-portrait_ipadmini_black_landscape.jpg");
+//		post(image);
         return "";
 	}
 	
@@ -120,12 +106,12 @@ public class GoogleHandlerImpl {
 	}
 
 	public boolean hasStoredAccessToken(String name) {
-		return acccessTokenMap.containsKey(name);
+		return !this.accessToken.isEmpty();
 	}
 
-	public String getStoredAccessToken(String name) {
-		return acccessTokenMap.get(name);
-	}
+//	public String getStoredAccessToken(String name) {
+//		return acccessTokenMap.get(name);
+//	}
 
 	public void setClientIdSecret(String clientId, String clientSecret) {
 		this.clientId = clientId;
@@ -135,6 +121,38 @@ public class GoogleHandlerImpl {
 	private OkHttpClient createHttpClient() {
 		OkHttpClient client = new OkHttpClient();
 		return client;		
+	}
+
+	public String post(String type, File file) {
+		
+//        final RequestBody requestBody = RequestBody.create(MediaType.parse("image/jpg"), file);    
+        final RequestBody requestBody = RequestBody.create(MediaType.parse(type), file);    
+		
+//		RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+//                .addFormDataPart("file", "myfile.jpg", RequestBody.create(MediaType.parse("image/jpg"), image))
+//                .build();
+		
+		OkHttpClient client = createHttpClient();//new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://www.googleapis.com/upload/drive/v3/files?uploadType=media")//&access_token=" + accessToken)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Content-Type", "image/jpeg")
+                .addHeader("Content-Length", String.valueOf(file.length()))
+                .post(requestBody)
+                .build();
+        try {
+			Response responseOk = client.newCall(request).execute();
+			System.out.println("Uploaded " + responseOk.toString());
+			return responseOk.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+        return "ERROR";
+	}
+
+	public String getStoredAccessToken(String name) {
+		return this.accessToken;
 	}
 	
 //	private OkHttpClient createHttpClientProxy() {

@@ -21,13 +21,13 @@ public class CloudServer {
 		new Thread() {
 			@Override
 			public void run() {
-				initializeWebServer(port, clientId, clientSecret);
+				initializeWebServer(port, "", "");
 			}
 		}.start();
 	}
 	
 	private void initializeWebServer(int port, String clientId, String clientSecret) {
-		googleHandler.setClientIdSecret(clientId, clientSecret);
+//		googleHandler.setClientIdSecret(clientId, clientSecret);
 //		googleHandler.setProxyInfo(user, password);
 		
 		Server server = null;//new Server(port);

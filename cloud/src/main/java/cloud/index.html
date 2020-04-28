@@ -37,12 +37,12 @@ $(function() {
 		});
 		
 		function login(code) {
-			var client_id = localStorage.getItem('clientid');
-			var client_secret = localStorage.getItem('clientsecret');
-			
+			var clientId = $('#clientId').val();
+			var clientSecret = $('#clientSecret').val();
 			$.ajax({
 			   type: "GET", 
-			   url: "http://" + window.location.host + "/api/system/login?&code=" + code,
+			   url: "//" + window.location.host + "/api/system/login?code=" + code + 
+			   		"&clientId=" + clientId + "&clientSecret=" + clientSecret,
 			   success: function(response){
 			   	if (response.startsWith('Redirect;')) {
 			   		var url = response.split(';')[1];
@@ -54,6 +54,28 @@ $(function() {
 			   }
 			});		
 		}
+		
+		function postFile() {
+			var file = $('#file1')[0].files[0];
+			var reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = function(event) {
+				$.ajax({
+		            url: "//" + window.location.host + "/api/system/post",
+		            type: 'POST',
+		            contentType: 'text/plain',
+					data: event.target.result,
+					processData: false
+		        })
+		        .done(function( data ) {
+		            $('#result').text(data.width + "x" + data.height);
+		        });			
+			}
+		}
+    
+		$('#post').click(function() {
+			postFile();
+		});
 	});
 })
 </script>
@@ -62,7 +84,14 @@ $(function() {
 <title>Users</title>
 </head>
 <body> 
+<div>Client ID<input type="text" id="clientId"></div>
+<div>Client Secret<input type="text" id="clientSecret"></div>
 <button id="login">Login</button>
 <label id="name"></label>
+
+  <form id="form1">
+    <input type="file" accept="*.*" id="file1"/>
+    <button id="post">Upload</button>
+  </form>
 </body>
 </html>

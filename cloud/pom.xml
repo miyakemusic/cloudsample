@@ -57,6 +57,7 @@
         <artifactId>jersey-media-json-jackson</artifactId>
         <version>2.29</version>
     </dependency>
+
 	<dependency>
 	    <groupId>com.fasterxml.jackson.core</groupId>
 	    <artifactId>jackson-core</artifactId>
@@ -93,5 +94,26 @@
       <artifactId>google-api-services-drive</artifactId>
       <version>v3-rev173-1.25.0</version>
     </dependency>
+    	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart -->
+	<dependency>
+	    <groupId>org.glassfish.jersey.media</groupId>
+	    <artifactId>jersey-media-multipart</artifactId>
+	    <version>2.29</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/net.iharder/base64 -->
+<dependency>
+    <groupId>net.iharder</groupId>
+    <artifactId>base64</artifactId>
+    <version>2.3.9</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+<dependency>
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+    <version>1.14</version>
+</dependency>
+
+	
   </dependencies>
 </project>
